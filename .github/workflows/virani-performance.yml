@@ -1,0 +1,55 @@
+name: Virani performance and memory patch
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch Virani
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          marker='<!-- VIRANI_PERFORMANCE_MEMORY_V2 -->'
+          if marker not in s:
+              css='''<style id="virani-performance-css">
+          .orb-glow,.ray{animation:none!important;filter:none!important}.orb{box-shadow:0 0 16px #ffb12b,0 0 35px #ff690055}.orb:before,.orb:after{box-shadow:none}.status-dot.on{animation:none!important;box-shadow:0 0 8px #ff6a00}.topbar,.composer,.status-line{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}.bubble{box-shadow:none!important}.messages{scroll-behavior:auto!important}
+          </style>'''
+              js=r'''<script id="virani-performance-js">
+          (()=>{
+            'use strict';
+            const SUPA_URL='https://hfczfnaaqwsmvgahiygc.supabase.co';
+            const SUPA_KEY='sb_publishable_AfyF3k8-uEzorkoYC98D-Q_QRlgkuvS';
+            const BRAIN='/functions/v1/virani-gemini';
+            const CONCISE='You are Virani, a professional personal AI assistant. Answer the user directly and briefly. Default to 1-5 short paragraphs or bullets. Do not repeat the question. Do not add filler, greetings, disclaimers, conclusions, or unnecessary step-by-step detail. Ask a clarifying question when the request is ambiguous or when an important detail is missing. Only give long/detailed answers when the user asks for detail, a plan, or a comprehensive explanation. If the user asks a simple question, give a simple answer.';
+            let memoryCache=[];
+            async function client(){return window.supabase?.createClient?.(SUPA_URL,SUPA_KEY)}
+            async function loadMemory(){try{const c=await client();if(!c)return;const {data:{session}}=await c.auth.getSession();if(!session)return;const {data}=await c.from('memories').select('memory,category,created_at').eq('user_id',session.user.id).order('created_at',{ascending:false}).limit(25);memoryCache=data||[]}catch(e){}}
+            loadMemory();
+            const nativeFetch=window.fetch.bind(window);
+            window.fetch=async (input,init={})=>{try{const url=typeof input==='string'?input:(input?.url||'');if(url.includes(BRAIN)&&init.body){const d=JSON.parse(init.body);const mem=memoryCache.slice(0,12).map(x=>'- '+x.memory).join('\n');const context=CONCISE+(mem?'\n\nRelevant long-term memory (use only when relevant):\n'+mem:'');if(typeof d.message==='string')d.message=context+'\n\nUSER REQUEST:\n'+d.message;if(Array.isArray(d.messages))d.messages=[{role:'system',content:context},...d.messages];init={...init,body:JSON.stringify(d)}}}catch(e){}return nativeFetch(input,init)};
+            if(window.speechSynthesis){const nativeSpeak=window.speechSynthesis.speak.bind(window.speechSynthesis);window.speechSynthesis.speak=function(u){try{let t=(u.text||'').replace(/```[\s\S]*?```/g,'Code omitted from voice output.').trim();if(t.length>1100)t=t.slice(0,1100).replace(/\s+\S*$/,'')+'…';u.text=t;u.rate=Math.max(.9,Math.min(1.02,u.rate||1))}catch(e){}return nativeSpeak(u)}}
+            async function remember(text){if(!/\b(remember|don't forget|do not forget|my name is|call me|i prefer|my preference is|i like|i hate)\b/i.test(text))return;try{const c=await client();if(!c)return;const {data:{session}}=await c.auth.getSession();if(!session)return;await c.from('memories').insert({user_id:session.user.id,memory:text.slice(0,700),category:'conversation'});await loadMemory()}catch(e){}}
+            const watch=()=>{const i=document.getElementById('messageInput');if(i&&i.value.trim())remember(i.value.trim())};
+            document.getElementById('sendButton')?.addEventListener('click',watch);document.getElementById('messageInput')?.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey)watch()});
+          })();
+          </script>'''
+              s=s.replace('</head>',css+'</head>')
+              s=s.replace('</body>',marker+js+'</body>')
+              p.write_text(s)
+          PY
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git diff --cached --quiet || git commit -m 'Apply Virani performance, concise replies, and memory patch'
+          git push
