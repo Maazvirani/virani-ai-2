@@ -1,0 +1,36 @@
+name: Wire Virani workspace scripts
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  wire:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Wire scripts
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          tags='''<script src="./workspace-ui.js"></script>\n<script src="./live-preview.js"></script>'''
+          if 'workspace-ui.js' not in s:
+              s=s.replace('</body>',tags+'\n</body>')
+          # Prevent duplicate attachment inputs/labels created by earlier patches.
+          import re
+          s=re.sub(r'<input id="viraniFileInput" type="file" multiple hidden>','<input id="viraniFileInput" type="file" multiple hidden>',s,count=1)
+          s=re.sub(r'(<input id="viraniFileInput" type="file" multiple hidden>)(<span id="viraniFileLabel"[^>]*></span>)\\1\\2','\\1\\2',s)
+          p.write_text(s)
+          PY
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git diff --cached --quiet || git commit -m 'Wire project, agent, and live preview workspace'
+          git push
