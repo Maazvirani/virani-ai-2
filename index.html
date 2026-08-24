@@ -77,5 +77,6 @@
   const watch=()=>{const i=document.getElementById('messageInput');if(i&&i.value.trim())remember(i.value.trim())};
   document.getElementById('sendButton')?.addEventListener('click',watch);document.getElementById('messageInput')?.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey)watch()});
 })();
-</script></body>
+</script><script src="./attachment-client.js"></script>
+</body>
 </html>
