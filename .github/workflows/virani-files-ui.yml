@@ -1,0 +1,46 @@
+name: Virani file picker fix
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch file picker
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          marker='<!-- VIRANI_FILES_UI_V1 -->'
+          if marker not in s:
+              # Add a real hidden file input before the existing attachment button area.
+              old='<button class="icon" id="attachButton" title="Files">📎</button>'
+              new=old+'<input id="viraniFileInput" type="file" multiple hidden><span id="viraniFileLabel" style="display:none;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#8d949f;font-size:11px"></span>'
+              s=s.replace(old,new,1)
+              old_js="$('attachButton').onclick=()=>alert('File tools are coming next.');"
+              new_js="""$('attachButton').onclick=()=>{$('viraniFileInput').click()};
+          $('viraniFileInput').onchange=e=>{const fs=[...e.target.files];const label=$('viraniFileLabel');if(!fs.length){label.style.display='none';return}label.textContent=fs.length===1?fs[0].name:fs.length+' files selected';label.style.display='inline-block';input.value='[Attached: '+fs.map(f=>f.name).join(', ')+']';input.focus()};"""
+              if old_js in s:
+                  s=s.replace(old_js,new_js,1)
+              else:
+                  # Fallback: append the handler before the closing IIFE script.
+                  needle="voiceButton.onclick=()=>setListening(!listening);init();"
+                  if needle in s:
+                      s=s.replace(needle,"voiceButton.onclick=()=>setListening(!listening);"+new_js+"init();",1)
+              s=s.replace('</body>',marker+'\n</body>',1)
+              p.write_text(s)
+          PY
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git diff --cached --quiet || git commit -m 'Fix Virani file attachment picker'
+          git push
