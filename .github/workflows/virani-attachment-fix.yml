@@ -1,0 +1,36 @@
+name: Virani attachment bug fix
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove fake attachment text injection
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          marker='<!-- VIRANI_ATTACHMENT_FIX_V2 -->'
+          if marker in s:
+              raise SystemExit(0)
+          # Keep the chosen file in browser memory/UI only. Do not write the
+          # filename into the AI prompt; that was being mistaken for file content.
+          s=s.replace("input.value='[Attached: '+fs.map(f=>f.name).join(', ')+']';input.focus()", "input.focus()")
+          s=s.replace("text.value='[Attached: '+fs.map(f=>f.name).join(', ')+']';text.focus()", "text.focus()")
+          p.write_text(s+"\n"+marker+"\n")
+          PY
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git diff --cached --quiet || git commit -m 'Fix attachment UI from sending filenames as prompts'
+          git push
