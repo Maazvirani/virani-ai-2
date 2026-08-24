@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Virani AI</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -13,57 +12,45 @@
       box-sizing: border-box;
     }
 
-    html,
     body {
       margin: 0;
-      width: 100%;
-      height: 100%;
-    }
-
-    body {
+      min-height: 100vh;
       font-family: Arial, Helvetica, sans-serif;
-      background: #05070c;
+      background: #05070d;
       color: white;
     }
 
-    .auth-screen {
+    /* AUTH */
+
+    #authScreen {
       min-height: 100vh;
       display: flex;
-      align-items: center;
       justify-content: center;
-      padding: 25px;
-      background:
-        radial-gradient(
-          circle at top left,
-          rgba(80, 90, 255, 0.18),
-          transparent 35%
-        ),
-        #05070c;
+      align-items: center;
+      padding: 20px;
     }
 
-    .auth-card {
-      width: min(420px, 100%);
-      background: #0c101b;
-      border: 1px solid #222a3a;
-      border-radius: 22px;
+    .card {
+      width: min(430px, 100%);
+      background: #0d111c;
+      border: 1px solid #252c3d;
+      border-radius: 20px;
       padding: 30px;
-      box-shadow: 0 20px 70px rgba(0,0,0,.45);
+      box-shadow: 0 20px 70px rgba(0, 0, 0, 0.45);
     }
 
-    .brand {
+    .logo {
       text-align: center;
-      margin-bottom: 28px;
-    }
-
-    .brand h1 {
-      margin: 0;
-      font-size: 34px;
+      font-size: 36px;
+      font-weight: bold;
       letter-spacing: 8px;
+      margin-bottom: 8px;
     }
 
-    .brand p {
-      color: #8c96ad;
-      margin-top: 10px;
+    .subtitle {
+      text-align: center;
+      color: #919bb0;
+      margin-bottom: 28px;
     }
 
     .tabs {
@@ -77,64 +64,65 @@
       padding: 12px;
       border: 0;
       border-radius: 10px;
-      background: #151b29;
-      color: #9da6bb;
       cursor: pointer;
-      font-weight: 600;
+      background: #171d2b;
+      color: #aab3c7;
+      font-weight: bold;
     }
 
     .tab.active {
       background: white;
-      color: #080a10;
+      color: black;
     }
 
     label {
       display: block;
       margin: 14px 0 7px;
-      color: #b3bccf;
-      font-size: 13px;
+      color: #b9c1d2;
+      font-size: 14px;
     }
 
     input {
       width: 100%;
       padding: 14px;
-      border-radius: 11px;
+      background: #080c14;
       border: 1px solid #2a3347;
-      background: #080c15;
+      border-radius: 10px;
       color: white;
       font-size: 15px;
       outline: none;
     }
 
     input:focus {
-      border-color: #707dff;
+      border-color: #7884ff;
     }
 
-    .primary {
+    #submitButton {
       width: 100%;
       margin-top: 20px;
-      border: 0;
-      border-radius: 11px;
       padding: 14px;
+      border: 0;
+      border-radius: 10px;
       background: white;
-      color: #07090d;
+      color: black;
       font-weight: bold;
       cursor: pointer;
     }
 
-    .status {
+    #status {
       min-height: 22px;
-      margin-top: 14px;
+      margin-top: 15px;
+      color: #aeb7ca;
       text-align: center;
-      color: #aeb8cc;
       font-size: 13px;
       line-height: 1.5;
     }
 
-    .dashboard {
+    /* DASHBOARD */
+
+    #dashboard {
       display: none;
       min-height: 100vh;
-      background: #05070c;
     }
 
     .layout {
@@ -143,29 +131,23 @@
     }
 
     .sidebar {
-      width: 245px;
+      width: 240px;
       background: #080b13;
-      border-right: 1px solid #1d2432;
+      border-right: 1px solid #1e2534;
       padding: 22px 15px;
-      display: flex;
-      flex-direction: column;
     }
 
     .sidebar-logo {
-      font-size: 22px;
+      font-size: 21px;
       font-weight: bold;
       letter-spacing: 5px;
-      margin: 0 10px 30px;
-    }
-
-    .nav {
-      display: grid;
-      gap: 6px;
+      margin: 0 10px 28px;
     }
 
     .nav-item {
       padding: 12px;
-      border-radius: 10px;
+      margin-bottom: 5px;
+      border-radius: 9px;
       color: #aab3c7;
     }
 
@@ -177,129 +159,119 @@
 
     .main {
       flex: 1;
+      min-width: 0;
       display: flex;
       flex-direction: column;
-      min-width: 0;
     }
 
     .topbar {
       height: 70px;
-      border-bottom: 1px solid #1d2432;
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0 22px;
+      border-bottom: 1px solid #1e2534;
     }
 
     .online {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      color: #9da7ba;
+      color: #aeb7ca;
       font-size: 13px;
     }
 
-    .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #36d399;
-    }
-
-    .logout {
-      background: #151b29;
-      color: white;
-      border: 1px solid #293247;
+    #logoutButton {
+      margin-left: 10px;
       padding: 9px 13px;
       border-radius: 9px;
+      background: #161c29;
+      border: 1px solid #2b3448;
+      color: white;
       cursor: pointer;
     }
 
-    .workspace {
+    .center {
       flex: 1;
       display: flex;
-      align-items: center;
+      flex-direction: column;
       justify-content: center;
-      padding: 40px;
+      align-items: center;
       text-align: center;
+      padding: 30px;
     }
 
     .orb {
-      width: 100px;
-      height: 100px;
-      margin: 0 auto 28px;
+      width: 105px;
+      height: 105px;
       border-radius: 50%;
+      margin-bottom: 25px;
       background:
         radial-gradient(
           circle at 35% 35%,
           white,
-          #8e9aff 28%,
-          #4b5bea 55%,
-          #101b67 76%,
-          #030513 100%
+          #929dff 28%,
+          #4c5bea 55%,
+          #101968 78%,
+          #03040b 100%
         );
       box-shadow:
-        0 0 35px rgba(85,100,255,.55),
-        0 0 100px rgba(85,100,255,.18);
+        0 0 35px rgba(90, 105, 255, 0.55),
+        0 0 100px rgba(90, 105, 255, 0.18);
     }
 
-    .welcome h1 {
+    .center h1 {
       margin: 0;
       font-size: 40px;
     }
 
-    .welcome p {
-      color: #8f99ad;
-      margin-top: 12px;
+    .center p {
+      color: #929bb0;
     }
 
     .composer {
       width: min(900px, 90%);
-      margin: 0 auto 28px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      margin: 0 auto 25px;
       padding: 9px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
       background: #0d111b;
       border: 1px solid #252d3e;
-      border-radius: 17px;
+      border-radius: 16px;
     }
 
     .composer input {
+      flex: 1;
       border: 0;
       background: transparent;
-      flex: 1;
-      min-width: 0;
     }
 
-    .icon-button,
-    .send-button {
+    .icon {
       width: 42px;
       height: 42px;
-      border-radius: 11px;
       border: 0;
+      border-radius: 10px;
+      background: #171d2b;
+      color: white;
       cursor: pointer;
     }
 
-    .icon-button {
-      background: #151b29;
-      color: white;
-    }
-
-    .send-button {
+    .send {
+      width: 42px;
+      height: 42px;
+      border: 0;
+      border-radius: 10px;
       background: white;
       color: black;
-      font-weight: bold;
+      cursor: pointer;
     }
 
     @media (max-width: 700px) {
       .sidebar {
         width: 70px;
-        padding: 18px 8px;
+        padding: 18px 7px;
       }
 
       .sidebar-logo {
-        font-size: 11px;
+        font-size: 10px;
         letter-spacing: 2px;
         text-align: center;
       }
@@ -313,8 +285,8 @@
         font-size: 18px;
       }
 
-      .welcome h1 {
-        font-size: 30px;
+      .center h1 {
+        font-size: 29px;
       }
     }
   </style>
@@ -324,55 +296,64 @@
 
   <!-- LOGIN / SIGNUP -->
 
-  <section class="auth-screen" id="authScreen">
+  <section id="authScreen">
 
-    <div class="auth-card">
+    <div class="card">
 
-      <div class="brand">
-        <h1>VIRANI</h1>
-        <p>Your personal AI system</p>
+      <div class="logo">VIRANI</div>
+
+      <div class="subtitle">
+        Your personal AI system
       </div>
 
       <div class="tabs">
-        <button class="tab active" id="loginTab">
+
+        <button
+          type="button"
+          class="tab active"
+          id="loginTab">
           Login
         </button>
 
-        <button class="tab" id="signupTab">
+        <button
+          type="button"
+          class="tab"
+          id="signupTab">
           Create account
         </button>
+
       </div>
 
       <form id="authForm">
 
-        <label for="email">
-          Email
-        </label>
+        <label for="email">Email</label>
 
         <input
           id="email"
           type="email"
+          autocomplete="email"
           placeholder="you@example.com"
           required
         >
 
-        <label for="password">
-          Password
-        </label>
+        <label for="password">Password</label>
 
         <input
           id="password"
           type="password"
+          autocomplete="current-password"
           placeholder="Password"
           minlength="6"
           required
         >
 
-        <button class="primary" type="submit" id="submitButton">
+        <button
+          id="submitButton"
+          type="submit">
           Sign in
         </button>
 
-        <div class="status" id="status"></div>
+        <div id="status"></div>
 
       </form>
 
@@ -383,7 +364,7 @@
 
   <!-- DASHBOARD -->
 
-  <section class="dashboard" id="dashboard">
+  <section id="dashboard">
 
     <div class="layout">
 
@@ -393,107 +374,70 @@
           VIRANI
         </div>
 
-        <div class="nav">
-
-          <div class="nav-item active">
-            💬 Chats
-          </div>
-
-          <div class="nav-item">
-            📁 Projects
-          </div>
-
-          <div class="nav-item">
-            🤖 Agents
-          </div>
-
-          <div class="nav-item">
-            🧠 Memory
-          </div>
-
-          <div class="nav-item">
-            📄 Files
-          </div>
-
-          <div class="nav-item">
-            🔗 Apps
-          </div>
-
-          <div class="nav-item">
-            ⚙️ Settings
-          </div>
-
-        </div>
+        <div class="nav-item active">💬 Chats</div>
+        <div class="nav-item">📁 Projects</div>
+        <div class="nav-item">🤖 Agents</div>
+        <div class="nav-item">🧠 Memory</div>
+        <div class="nav-item">📄 Files</div>
+        <div class="nav-item">🔗 Apps</div>
+        <div class="nav-item">⚙️ Settings</div>
 
       </aside>
-
 
       <main class="main">
 
         <header class="topbar">
 
           <div class="online">
-            <span class="dot"></span>
-            Virani is online
+            🟢 Virani is online
           </div>
 
           <div>
-
             <span id="userEmail"></span>
 
             <button
-              class="logout"
-              id="logoutButton">
+              id="logoutButton"
+              type="button">
               Log out
             </button>
-
           </div>
 
         </header>
 
+        <div class="center">
 
-        <div class="workspace">
+          <div class="orb"></div>
 
-          <div class="welcome">
+          <h1>Hello. I'm Virani.</h1>
 
-            <div class="orb"></div>
-
-            <h1>
-              Hello. I'm Virani.
-            </h1>
-
-            <p>
-              Your personal AI system.
-            </p>
-
-          </div>
+          <p>
+            Your personal AI system.
+          </p>
 
         </div>
-
 
         <div class="composer">
 
           <button
-            class="icon-button"
-            type="button">
+            type="button"
+            class="icon">
             🎙️
           </button>
 
           <input
             id="messageInput"
-            type="text"
             placeholder="Ask Virani anything..."
           >
 
           <button
-            class="icon-button"
-            type="button">
+            type="button"
+            class="icon">
             📎
           </button>
 
           <button
-            class="send-button"
-            type="button">
+            type="button"
+            class="send">
             ➤
           </button>
 
@@ -508,18 +452,20 @@
 
   <script>
 
-    /*
-      =====================================================
-      VIRANI SUPABASE CONNECTION
+    /* ==================================================
+       SUPABASE SETTINGS
+       ================================================== */
 
-      Replace the two values below with your own values.
-      =====================================================
-    */
+    const SUPABASE_URL =
+      https://hfczfnaaqwsmvgahiygc.supabase.co/rest/v1/
 
-    const SUPABASE_URL =https://hfczfnaaqwsmvgahiygc.supabase.co/rest/v1/
+    const SUPABASE_PUBLISHABLE_KEY =
+   sb_publishable_AfyF3k8-uEzorkoYC98D-Q_QRlgkuvS
 
-    const SUPABASE_PUBLISHABLE_KEY =sb_publishable_AfyF3k8-uEzorkoYC98D-Q_QRlgkuvS
 
+    /* ==================================================
+       CONNECT TO SUPABASE
+       ================================================== */
 
     const supabaseClient =
       window.supabase.createClient(
@@ -528,8 +474,9 @@
       );
 
 
-    let mode = "login";
-
+    /* ==================================================
+       ELEMENTS
+       ================================================== */
 
     const authScreen =
       document.getElementById("authScreen");
@@ -540,17 +487,17 @@
     const authForm =
       document.getElementById("authForm");
 
-    const status =
-      document.getElementById("status");
-
-    const submitButton =
-      document.getElementById("submitButton");
-
     const loginTab =
       document.getElementById("loginTab");
 
     const signupTab =
       document.getElementById("signupTab");
+
+    const submitButton =
+      document.getElementById("submitButton");
+
+    const status =
+      document.getElementById("status");
 
     const userEmail =
       document.getElementById("userEmail");
@@ -559,210 +506,175 @@
       document.getElementById("logoutButton");
 
 
-    /*
-      LOGIN TAB
-    */
+    let mode = "login";
 
-    loginTab.addEventListener(
-      "click",
-      () => {
 
-        mode = "login";
+    /* ==================================================
+       LOGIN TAB
+       ================================================== */
 
-        loginTab.classList.add("active");
-        signupTab.classList.remove("active");
+    loginTab.addEventListener("click", function () {
 
-        submitButton.textContent =
-          "Sign in";
+      mode = "login";
 
-        status.textContent = "";
+      loginTab.classList.add("active");
+
+      signupTab.classList.remove("active");
+
+      submitButton.textContent = "Sign in";
+
+      status.textContent = "";
+
+    });
+
+
+    /* ==================================================
+       SIGNUP TAB
+       ================================================== */
+
+    signupTab.addEventListener("click", function () {
+
+      mode = "signup";
+
+      signupTab.classList.add("active");
+
+      loginTab.classList.remove("active");
+
+      submitButton.textContent = "Create account";
+
+      status.textContent = "";
+
+    });
+
+
+    /* ==================================================
+       LOGIN / SIGNUP
+       ================================================== */
+
+    authForm.addEventListener("submit", async function (event) {
+
+      event.preventDefault();
+
+      status.textContent = "Please wait...";
+
+      const email =
+        document.getElementById("email").value.trim();
+
+      const password =
+        document.getElementById("password").value;
+
+
+      try {
+
+        /* CREATE ACCOUNT */
+
+        if (mode === "signup") {
+
+          const result =
+            await supabaseClient.auth.signUp({
+
+              email: email,
+
+              password: password
+
+            });
+
+
+          if (result.error) {
+
+            throw result.error;
+
+          }
+
+
+          if (!result.data.session) {
+
+            status.textContent =
+              "Account created. Check your email to confirm your account.";
+
+            return;
+
+          }
+
+
+          await saveProfile(result.data.user);
+
+          showDashboard(result.data.user);
+
+          return;
+        }
+
+
+        /* LOGIN */
+
+        const result =
+          await supabaseClient.auth.signInWithPassword({
+
+            email: email,
+
+            password: password
+
+          });
+
+
+        if (result.error) {
+
+          throw result.error;
+
+        }
+
+
+        await saveProfile(result.data.user);
+
+        showDashboard(result.data.user);
 
       }
-    );
 
+      catch (error) {
 
-    /*
-      SIGNUP TAB
-    */
-
-    signupTab.addEventListener(
-      "click",
-      () => {
-
-        mode = "signup";
-
-        signupTab.classList.add("active");
-        loginTab.classList.remove("active");
-
-        submitButton.textContent =
-          "Create account";
-
-        status.textContent = "";
-
-      }
-    );
-
-
-    /*
-      LOGIN / SIGNUP
-    */
-
-    authForm.addEventListener(
-      "submit",
-      async (event) => {
-
-        event.preventDefault();
-
-        const email =
-          document.getElementById("email")
-          .value
-          .trim();
-
-        const password =
-          document.getElementById("password")
-          .value;
-
+        console.error(error);
 
         status.textContent =
-          "Connecting to Virani...";
-
-
-        try {
-
-          /*
-            CREATE ACCOUNT
-          */
-
-          if (mode === "signup") {
-
-            const {
-              data,
-              error
-            } =
-              await supabaseClient.auth.signUp({
-
-                email: email,
-
-                password: password,
-
-                options: {
-
-                  emailRedirectTo:
-                    "https://virani-ai-2.pages.dev/"
-
-                }
-
-              });
-
-
-            if (error) {
-              throw error;
-            }
-
-
-            /*
-              EMAIL CONFIRMATION ENABLED
-            */
-
-            if (!data.session) {
-
-              status.textContent =
-                "Account created. Check your email and confirm your account.";
-
-              return;
-
-            }
-
-
-            await createProfile(data.user);
-
-            showDashboard(data.user);
-
-          }
-
-
-          /*
-            LOGIN
-          */
-
-          else {
-
-            const {
-              data,
-              error
-            } =
-              await supabaseClient.auth
-              .signInWithPassword({
-
-                email: email,
-
-                password: password
-
-              });
-
-
-            if (error) {
-              throw error;
-            }
-
-
-            await createProfile(data.user);
-
-            showDashboard(data.user);
-
-          }
-
-        }
-
-        catch (error) {
-
-          console.error(error);
-
-          status.textContent =
-            error.message ||
-            "Something went wrong.";
-
-        }
+          error.message ||
+          "Something went wrong.";
 
       }
-    );
+
+    });
 
 
-    /*
-      CREATE USER PROFILE
-    */
+    /* ==================================================
+       SAVE PROFILE
+       ================================================== */
 
-    async function createProfile(user) {
+    async function saveProfile(user) {
 
       if (!user) {
         return;
       }
 
-
-      const {
-        error
-      } =
+      const result =
         await supabaseClient
-        .from("profiles")
-        .upsert({
+          .from("profiles")
+          .upsert({
 
-          id: user.id,
+            id: user.id,
 
-          email: user.email,
+            email: user.email,
 
-          display_name:
-            user.email
-              ? user.email.split("@")[0]
-              : "Virani User"
+            display_name:
+              user.email
+                ? user.email.split("@")[0]
+                : "Virani User"
 
-        });
+          });
 
 
-      if (error) {
+      if (result.error) {
 
         console.error(
           "Profile error:",
-          error
+          result.error
         );
 
       }
@@ -770,117 +682,65 @@
     }
 
 
-    /*
-      LOGOUT
-    */
-
-    logoutButton.addEventListener(
-      "click",
-      async () => {
-
-        const {
-          error
-        } =
-          await supabaseClient.auth
-          .signOut();
-
-
-        if (error) {
-
-          console.error(error);
-
-          return;
-
-        }
-
-
-        showLogin();
-
-      }
-    );
-
-
-    /*
-      SHOW DASHBOARD
-    */
+    /* ==================================================
+       SHOW DASHBOARD
+       ================================================== */
 
     function showDashboard(user) {
 
-      authScreen.style.display =
-        "none";
+      authScreen.style.display = "none";
 
-      dashboard.style.display =
-        "block";
+      dashboard.style.display = "block";
 
       userEmail.textContent =
-        user?.email ||
-        "Virani User";
+        user?.email || "Virani User";
 
     }
 
 
-    /*
-      SHOW LOGIN
-    */
+    /* ==================================================
+       SHOW LOGIN
+       ================================================== */
 
     function showLogin() {
 
-      dashboard.style.display =
-        "none";
+      dashboard.style.display = "none";
 
-      authScreen.style.display =
-        "flex";
+      authScreen.style.display = "flex";
 
     }
 
 
-    /*
-      WATCH LOGIN SESSION
-    */
+    /* ==================================================
+       LOGOUT
+       ================================================== */
 
-    supabaseClient.auth.onAuthStateChange(
-      (event, session) => {
+    logoutButton.addEventListener("click", async function () {
 
-        if (session?.user) {
+      await supabaseClient.auth.signOut();
 
-          showDashboard(
-            session.user
-          );
+      showLogin();
 
-        }
-
-        else {
-
-          showLogin();
-
-        }
-
-      }
-    );
+    });
 
 
-    /*
-      CHECK CURRENT SESSION
-    */
+    /* ==================================================
+       CHECK EXISTING SESSION
+       ================================================== */
 
-    async function initialize() {
+    async function checkSession() {
 
-      const {
-        data
-      } =
-        await supabaseClient.auth
-        .getSession();
+      const result =
+        await supabaseClient.auth.getSession();
 
+      const session =
+        result.data.session;
 
-      if (data.session?.user) {
+      if (session && session.user) {
 
-        showDashboard(
-          data.session.user
-        );
+        showDashboard(session.user);
 
-      }
-
-      else {
+      } else {
 
         showLogin();
 
@@ -889,7 +749,11 @@
     }
 
 
-    initialize();
+    /* ==================================================
+       START VIRANI
+       ================================================== */
+
+    checkSession();
 
   </script>
 
