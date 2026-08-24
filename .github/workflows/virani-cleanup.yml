@@ -1,0 +1,52 @@
+name: Virani lightweight UI cleanup
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  cleanup:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove heavy enhancement layers
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('index.html')
+          s=p.read_text()
+          # Remove the two UI enhancement layers that added duplicate DOM observers,
+          # duplicate file/context controls, timers, blur effects and extra layout.
+          for marker, script_id in [
+              ('<!-- VIRANI_ENHANCEMENTS_V1 -->','virani-enhancement-js'),
+              ('<!-- VIRANI_PRO_UI_V2 -->','virani-pro-js'),
+          ]:
+              start=s.find(marker)
+              if start >= 0:
+                  end_tag=s.find('</script>', s.find('<script', start))
+                  # For these blocks the marker is followed by style/html and the final script.
+                  end=s.find('</script>', s.find(f'id="{script_id}"', start))
+                  if end >= 0:
+                      s=s[:start]+s[end+9:]
+          # Add a single lightweight visual pass. No blur, no animation, no extra observers.
+          marker='<!-- VIRANI_LIGHTWEIGHT_UI_V1 -->'
+          if marker not in s:
+              css='''<style id="virani-lightweight-css">
+          /* Lightweight professional UI: one layout, minimal GPU work. */
+          .orb-glow,.ray{display:none!important}.orb{width:118px!important;height:118px!important;box-shadow:0 0 22px #22d3ee55!important}.orb:before,.orb:after{display:none!important}.orb-core{width:10px!important;height:10px!important;box-shadow:0 0 14px #fff,0 0 30px #22d3ee!important}
+          .orb-wrap{width:170px!important;height:170px!important}.welcome h1{font-size:22px!important;letter-spacing:4px!important}.welcome p{font-size:12px!important}.topbar,.composer,.status-line{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;box-shadow:none!important}.messages{scroll-behavior:auto!important}.bubble{box-shadow:none!important}.message-row{margin-bottom:12px!important}.typing{font-size:11px!important}
+          </style>'''
+              s=s.replace('</head>',css+marker+'</head>')
+          p.write_text(s)
+          PY
+      - name: Commit cleanup
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git diff --cached --quiet || git commit -m 'Remove heavy UI layers and simplify Virani'
+          git push
