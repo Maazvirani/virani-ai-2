@@ -1,0 +1,64 @@
+name: Virani stability fix
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Replace unstable frontend controller
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('index.html'); s=p.read_text()
+          start=s.rfind('<script>')
+          end=s.rfind('</script>')
+          if start<0 or end<start: raise SystemExit('frontend script not found')
+          js=r'''<script>
+          (()=>{
+            'use strict';
+            const URL='https://hfczfnaaqwsmvgahiygc.supabase.co';
+            const KEY='sb_publishable_AfyF3k8-uEzorkoYC98D-Q_QRlgkuvS';
+            const BRAIN=URL+'/functions/v1/virani-gemini';
+            const sb=window.supabase.createClient(URL,KEY);
+            const $=id=>document.getElementById(id);
+            let user=null,chat=null,signup=false,sending=false,listening=false,recognition=null,speaking=false;
+            const auth=$('authScreen'),dash=$('dashboard'),input=$('messageInput'),msgs=$('messages'),welcome=$('welcome');
+            function authMode(v){signup=v;$('loginTab').classList.toggle('active',!v);$('signupTab').classList.toggle('active',v);$('submitButton').textContent=v?'Create account':'Sign in';$('status').textContent=''}
+            $('loginTab').onclick=()=>authMode(false);$('signupTab').onclick=()=>authMode(true);
+            $('authForm').onsubmit=async e=>{e.preventDefault();$('submitButton').disabled=true;$('status').textContent=signup?'Creating account…':'Signing in…';try{const r=signup?await sb.auth.signUp({email:$('email').value.trim(),password:$('password').value}):await sb.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(r.error)throw r.error;if(signup&&!r.data.session){$('status').textContent='Account created. Check your email, then sign in.';authMode(false)}else await enter(r.data.user)}catch(e){$('status').textContent=e.message||'Authentication failed.'}finally{$('submitButton').disabled=false}};
+            async function enter(u){user=u;auth.style.display='none';dash.style.display='block';$('userEmail').textContent=u.email||'';await loadChats();setTimeout(()=>setListening(true),700)}
+            async function loadChats(){const r=await sb.from('conversations').select('id,title').eq('user_id',user.id).order('updated_at',{ascending:false}).limit(25);$('conversationList').innerHTML='';(r.data||[]).forEach(c=>{const x=document.createElement('div');x.className='conversation';x.textContent=c.title||'New Chat';x.onclick=()=>loadChat(c.id);$('conversationList').appendChild(x)})}
+            async function newChat(){const r=await sb.from('conversations').insert({user_id:user.id,title:'New Chat'}).select().single();if(r.error)throw r.error;chat=r.data;msgs.innerHTML='';welcome.style.display='flex'}
+            async function loadChat(id){const c=await sb.from('conversations').select('*').eq('id',id).eq('user_id',user.id).single();if(c.error)return;chat=c.data;msgs.innerHTML='';welcome.style.display='none';const m=await sb.from('messages').select('role,content').eq('conversation_id',id).eq('user_id',user.id).order('created_at');(m.data||[]).forEach(x=>render(x.role,x.content,false))}
+            function render(role,text,voice){welcome.style.display='none';const r=document.createElement('div');r.className='message-row '+role;const b=document.createElement('div');b.className='bubble';b.textContent=text;r.appendChild(b);msgs.appendChild(r);msgs.scrollTop=msgs.scrollHeight;if(role==='assistant'){ $('contextBody')&&($('contextBody').textContent=text); if(voice)speak(text)}}
+            function stopSpeak(){if(window.speechSynthesis){speechSynthesis.cancel();speaking=false}}
+            function voice(){if(!window.speechSynthesis)return;const vs=speechSynthesis.getVoices();return vs.find(v=>/en-(US|GB)/i.test(v.lang))||vs[0]}
+            function speak(text){stopSpeak();if(!window.speechSynthesis)return;speaking=true;stopRecognition();const u=new SpeechSynthesisUtterance(text.length>1000?text.slice(0,1000)+'…':text);u.lang='en-US';u.rate=.88;u.pitch=.5;const v=voice();if(v)u.voice=v;u.onend=()=>{speaking=false;if(listening)setTimeout(startRecognition,300)};u.onerror=u.onend;speechSynthesis.speak(u)}
+            function stopRecognition(){if(recognition){try{recognition.stop()}catch{}recognition=null}}
+            function startRecognition(){if(!listening||speaking||recognition)return;const R=window.SpeechRecognition||window.webkitSpeechRecognition;if(!R){$('voiceStatus').textContent='Voice unavailable';return}recognition=new R();recognition.lang='en-US';recognition.continuous=false;recognition.interimResults=false;recognition.maxAlternatives=1;recognition.onresult=e=>{const t=(e.results?.[0]?.[0]?.transcript||'').trim();recognition=null;if(t){input.value=t;sendMessage()}};recognition.onerror=e=>{recognition=null;if(e.error==='not-allowed'||e.error==='service-not-allowed'){setListening(false);$('voiceStatus').textContent='Microphone permission required'}};recognition.onend=()=>{recognition=null;if(listening&&!speaking)setTimeout(startRecognition,500)};try{recognition.start()}catch{recognition=null}}
+            function setListening(on){listening=on;$('voiceButton').classList.toggle('listening',on);$('statusDot').classList.toggle('on',on);$('voiceStatus').textContent=on?'Listening…':'Microphone off';if(on)startRecognition();else stopRecognition()}
+            async function sendMessage(){if(sending)return;const text=input.value.trim();if(!text||!user)return;sending=true;$('sendButton').disabled=true;$('typing').style.display='block';input.value='';try{if(!chat)await newChat();render('user',text,false);const session=(await sb.auth.getSession()).data.session;if(!session)throw Error('Session expired.');const a=await sb.from('messages').insert({conversation_id:chat.id,user_id:user.id,role:'user',content:text});if(a.error)throw a.error;const r=await fetch(BRAIN,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token,'apikey':KEY},body:JSON.stringify({message:text})});const d=await r.json();if(!r.ok)throw Error(d.error||'Brain request failed');await sb.from('messages').insert({conversation_id:chat.id,user_id:user.id,role:'assistant',content:d.reply});await sb.from('conversations').update({title:text.slice(0,55),updated_at:new Date().toISOString()}).eq('id',chat.id).eq('user_id',user.id);render('assistant',d.reply,true);await loadChats()}catch(e){render('assistant','I could not reach my AI brain: '+(e.message||'Please try again.'))}finally{$('typing').style.display='none';$('sendButton').disabled=false;sending=false}}
+            $('sendButton').onclick=sendMessage;$('messageInput').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();sendMessage()}};$('voiceButton').onclick=()=>setListening(!listening);$('newChatButton').onclick=()=>newChat();$('logoutButton').onclick=async()=>{setListening(false);stopSpeak();await sb.auth.signOut();location.reload()};
+            $('attachButton').onclick=()=>$('viraniFileInput').click();$('viraniFileInput').onchange=e=>{const f=[...e.target.files];$('viraniFileLabel').textContent=f.length?(f.length===1?f[0].name:f.length+' files selected'):'';$('viraniFileLabel').style.display=f.length?'inline-block':'none'};
+            window.addEventListener('pagehide',()=>{setListening(false);stopSpeak()});
+            sb.auth.getSession().then(r=>{if(r.data.session)enter(r.data.session.user)});
+          })();
+          </script>'''
+          s=s[:start]+js+s[end+9:]
+          p.write_text(s)
+          PY
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git diff --cached --quiet || git commit -m 'Replace unstable frontend controller with stable event loop'
+          git push
