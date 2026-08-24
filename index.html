@@ -3,54 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#05070d">
   <title>Virani AI</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
+    * { box-sizing: border-box; }
+
+    :root {
+      color-scheme: dark;
+      font-family: Arial, Helvetica, sans-serif;
     }
 
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: Arial, Helvetica, sans-serif;
       background: #05070d;
-      color: white;
+      color: #fff;
     }
 
-    /* AUTH */
+    button, input { font: inherit; }
+    button { cursor: pointer; }
 
     #authScreen {
       min-height: 100vh;
       display: flex;
-      justify-content: center;
       align-items: center;
-      padding: 20px;
+      justify-content: center;
+      padding: 24px;
     }
 
     .card {
       width: min(430px, 100%);
-      background: #0d111c;
+      padding: 30px;
       border: 1px solid #252c3d;
       border-radius: 20px;
-      padding: 30px;
-      box-shadow: 0 20px 70px rgba(0, 0, 0, 0.45);
+      background: #0d111c;
+      box-shadow: 0 20px 70px rgba(0,0,0,.45);
     }
 
     .logo {
       text-align: center;
       font-size: 36px;
-      font-weight: bold;
+      font-weight: 700;
       letter-spacing: 8px;
-      margin-bottom: 8px;
     }
 
     .subtitle {
+      margin: 8px 0 28px;
       text-align: center;
       color: #919bb0;
-      margin-bottom: 28px;
     }
 
     .tabs {
@@ -61,18 +64,17 @@
 
     .tab {
       flex: 1;
-      padding: 12px;
       border: 0;
       border-radius: 10px;
-      cursor: pointer;
+      padding: 12px;
       background: #171d2b;
       color: #aab3c7;
-      font-weight: bold;
+      font-weight: 700;
     }
 
     .tab.active {
-      background: white;
-      color: black;
+      background: #fff;
+      color: #000;
     }
 
     label {
@@ -85,17 +87,14 @@
     input {
       width: 100%;
       padding: 14px;
-      background: #080c14;
       border: 1px solid #2a3347;
       border-radius: 10px;
-      color: white;
-      font-size: 15px;
-      outline: none;
+      outline: 0;
+      background: #080c14;
+      color: #fff;
     }
 
-    input:focus {
-      border-color: #7884ff;
-    }
+    input:focus { border-color: #7884ff; }
 
     #submitButton {
       width: 100%;
@@ -103,14 +102,15 @@
       padding: 14px;
       border: 0;
       border-radius: 10px;
-      background: white;
-      color: black;
-      font-weight: bold;
-      cursor: pointer;
+      background: #fff;
+      color: #000;
+      font-weight: 700;
     }
 
+    #submitButton:disabled { opacity: .6; cursor: wait; }
+
     #status {
-      min-height: 22px;
+      min-height: 24px;
       margin-top: 15px;
       color: #aeb7ca;
       text-align: center;
@@ -118,113 +118,84 @@
       line-height: 1.5;
     }
 
-    /* DASHBOARD */
+    #dashboard { display: none; min-height: 100vh; }
 
-    #dashboard {
-      display: none;
-      min-height: 100vh;
-    }
-
-    .layout {
-      min-height: 100vh;
-      display: flex;
-    }
+    .layout { min-height: 100vh; display: flex; }
 
     .sidebar {
       width: 240px;
-      background: #080b13;
-      border-right: 1px solid #1e2534;
       padding: 22px 15px;
+      border-right: 1px solid #1e2534;
+      background: #080b13;
     }
 
     .sidebar-logo {
-      font-size: 21px;
-      font-weight: bold;
-      letter-spacing: 5px;
       margin: 0 10px 28px;
+      font-size: 21px;
+      font-weight: 700;
+      letter-spacing: 5px;
     }
 
     .nav-item {
-      padding: 12px;
       margin-bottom: 5px;
+      padding: 12px;
       border-radius: 9px;
       color: #aab3c7;
     }
 
-    .nav-item.active,
-    .nav-item:hover {
+    .nav-item.active, .nav-item:hover {
       background: #151b29;
-      color: white;
+      color: #fff;
     }
 
     .main {
-      flex: 1;
       min-width: 0;
+      flex: 1;
       display: flex;
       flex-direction: column;
     }
 
     .topbar {
       height: 70px;
+      padding: 0 22px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 22px;
       border-bottom: 1px solid #1e2534;
     }
 
-    .online {
-      color: #aeb7ca;
-      font-size: 13px;
-    }
+    .online { color: #aeb7ca; font-size: 13px; }
 
     #logoutButton {
       margin-left: 10px;
       padding: 9px 13px;
+      border: 1px solid #2b3448;
       border-radius: 9px;
       background: #161c29;
-      border: 1px solid #2b3448;
-      color: white;
-      cursor: pointer;
+      color: #fff;
     }
 
     .center {
       flex: 1;
+      padding: 30px;
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       text-align: center;
-      padding: 30px;
     }
 
     .orb {
       width: 105px;
       height: 105px;
-      border-radius: 50%;
       margin-bottom: 25px;
-      background:
-        radial-gradient(
-          circle at 35% 35%,
-          white,
-          #929dff 28%,
-          #4c5bea 55%,
-          #101968 78%,
-          #03040b 100%
-        );
-      box-shadow:
-        0 0 35px rgba(90, 105, 255, 0.55),
-        0 0 100px rgba(90, 105, 255, 0.18);
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #fff, #929dff 28%, #4c5bea 55%, #101968 78%, #03040b 100%);
+      box-shadow: 0 0 35px rgba(90,105,255,.55), 0 0 100px rgba(90,105,255,.18);
     }
 
-    .center h1 {
-      margin: 0;
-      font-size: 40px;
-    }
-
-    .center p {
-      color: #929bb0;
-    }
+    .center h1 { margin: 0; font-size: 40px; }
+    .center p { color: #929bb0; }
 
     .composer {
       width: min(900px, 90%);
@@ -233,9 +204,9 @@
       display: flex;
       gap: 8px;
       align-items: center;
-      background: #0d111b;
       border: 1px solid #252d3e;
       border-radius: 16px;
+      background: #0d111b;
     }
 
     .composer input {
@@ -244,136 +215,55 @@
       background: transparent;
     }
 
-    .icon {
+    .icon, .send {
       width: 42px;
       height: 42px;
       border: 0;
       border-radius: 10px;
-      background: #171d2b;
-      color: white;
-      cursor: pointer;
     }
 
-    .send {
-      width: 42px;
-      height: 42px;
-      border: 0;
-      border-radius: 10px;
-      background: white;
-      color: black;
-      cursor: pointer;
-    }
+    .icon { background: #171d2b; color: #fff; }
+    .send { background: #fff; color: #000; }
 
     @media (max-width: 700px) {
-      .sidebar {
-        width: 70px;
-        padding: 18px 7px;
-      }
-
-      .sidebar-logo {
-        font-size: 10px;
-        letter-spacing: 2px;
-        text-align: center;
-      }
-
-      .nav-item {
-        font-size: 0;
-        text-align: center;
-      }
-
-      .nav-item::first-letter {
-        font-size: 18px;
-      }
-
-      .center h1 {
-        font-size: 29px;
-      }
+      .sidebar { width: 70px; padding: 18px 7px; }
+      .sidebar-logo { margin: 0 0 20px; font-size: 10px; letter-spacing: 2px; text-align: center; }
+      .nav-item { font-size: 0; text-align: center; }
+      .nav-item::first-letter { font-size: 18px; }
+      .center h1 { font-size: 29px; }
+      .topbar { padding: 0 12px; }
     }
   </style>
 </head>
-
 <body>
 
-  <!-- LOGIN / SIGNUP -->
-
   <section id="authScreen">
-
     <div class="card">
-
       <div class="logo">VIRANI</div>
-
-      <div class="subtitle">
-        Your personal AI system
-      </div>
+      <div class="subtitle">Your personal AI system</div>
 
       <div class="tabs">
-
-        <button
-          type="button"
-          class="tab active"
-          id="loginTab">
-          Login
-        </button>
-
-        <button
-          type="button"
-          class="tab"
-          id="signupTab">
-          Create account
-        </button>
-
+        <button type="button" class="tab active" id="loginTab">Login</button>
+        <button type="button" class="tab" id="signupTab">Create account</button>
       </div>
 
-      <form id="authForm">
-
+      <form id="authForm" novalidate>
         <label for="email">Email</label>
-
-        <input
-          id="email"
-          type="email"
-          autocomplete="email"
-          placeholder="you@example.com"
-          required
-        >
+        <input id="email" type="email" autocomplete="email" placeholder="you@example.com" required>
 
         <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="current-password" placeholder="Password" minlength="6" required>
 
-        <input
-          id="password"
-          type="password"
-          autocomplete="current-password"
-          placeholder="Password"
-          minlength="6"
-          required
-        >
-
-        <button
-          id="submitButton"
-          type="submit">
-          Sign in
-        </button>
-
-        <div id="status"></div>
-
+        <button id="submitButton" type="submit">Sign in</button>
+        <div id="status" role="status" aria-live="polite"></div>
       </form>
-
     </div>
-
   </section>
 
-
-  <!-- DASHBOARD -->
-
   <section id="dashboard">
-
     <div class="layout">
-
       <aside class="sidebar">
-
-        <div class="sidebar-logo">
-          VIRANI
-        </div>
-
+        <div class="sidebar-logo">VIRANI</div>
         <div class="nav-item active">💬 Chats</div>
         <div class="nav-item">📁 Projects</div>
         <div class="nav-item">🤖 Agents</div>
@@ -381,381 +271,182 @@
         <div class="nav-item">📄 Files</div>
         <div class="nav-item">🔗 Apps</div>
         <div class="nav-item">⚙️ Settings</div>
-
       </aside>
 
       <main class="main">
-
         <header class="topbar">
-
-          <div class="online">
-            🟢 Virani is online
-          </div>
-
+          <div class="online">🟢 Virani is online</div>
           <div>
             <span id="userEmail"></span>
-
-            <button
-              id="logoutButton"
-              type="button">
-              Log out
-            </button>
+            <button id="logoutButton" type="button">Log out</button>
           </div>
-
         </header>
 
         <div class="center">
-
           <div class="orb"></div>
-
           <h1>Hello. I'm Virani.</h1>
-
-          <p>
-            Your personal AI system.
-          </p>
-
+          <p>Your personal AI system.</p>
         </div>
 
         <div class="composer">
-
-          <button
-            type="button"
-            class="icon">
-            🎙️
-          </button>
-
-          <input
-            id="messageInput"
-            placeholder="Ask Virani anything..."
-          >
-
-          <button
-            type="button"
-            class="icon">
-            📎
-          </button>
-
-          <button
-            type="button"
-            class="send">
-            ➤
-          </button>
-
+          <button type="button" class="icon" title="Voice">🎙️</button>
+          <input id="messageInput" placeholder="Ask Virani anything...">
+          <button type="button" class="icon" title="Attach">📎</button>
+          <button type="button" class="send" title="Send">➤</button>
         </div>
-
       </main>
-
     </div>
-
   </section>
 
-
   <script>
-
-    /* ==================================================
-       SUPABASE SETTINGS
-       ================================================== */
-
-    const SUPABASE_URL =
-      https://hfczfnaaqwsmvgahiygc.supabase.co/rest/v1/
-
-    const SUPABASE_PUBLISHABLE_KEY =
-   sb_publishable_AfyF3k8-uEzorkoYC98D-Q_QRlgkuvS
-
-
-    /* ==================================================
-       CONNECT TO SUPABASE
-       ================================================== */
-
-    const supabaseClient =
-      window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
-      );
-
-
-    /* ==================================================
-       ELEMENTS
-       ================================================== */
-
-    const authScreen =
-      document.getElementById("authScreen");
-
-    const dashboard =
-      document.getElementById("dashboard");
-
-    const authForm =
-      document.getElementById("authForm");
-
-    const loginTab =
-      document.getElementById("loginTab");
-
-    const signupTab =
-      document.getElementById("signupTab");
-
-    const submitButton =
-      document.getElementById("submitButton");
-
-    const status =
-      document.getElementById("status");
-
-    const userEmail =
-      document.getElementById("userEmail");
-
-    const logoutButton =
-      document.getElementById("logoutButton");
-
-
-    let mode = "login";
-
-
-    /* ==================================================
-       LOGIN TAB
-       ================================================== */
-
-    loginTab.addEventListener("click", function () {
-
-      mode = "login";
-
-      loginTab.classList.add("active");
-
-      signupTab.classList.remove("active");
-
-      submitButton.textContent = "Sign in";
-
-      status.textContent = "";
-
-    });
-
-
-    /* ==================================================
-       SIGNUP TAB
-       ================================================== */
-
-    signupTab.addEventListener("click", function () {
-
-      mode = "signup";
-
-      signupTab.classList.add("active");
-
-      loginTab.classList.remove("active");
-
-      submitButton.textContent = "Create account";
-
-      status.textContent = "";
-
-    });
-
-
-    /* ==================================================
-       LOGIN / SIGNUP
-       ================================================== */
-
-    authForm.addEventListener("submit", async function (event) {
-
-      event.preventDefault();
-
-      status.textContent = "Please wait...";
-
-      const email =
-        document.getElementById("email").value.trim();
-
-      const password =
-        document.getElementById("password").value;
-
-
-      try {
-
-        /* CREATE ACCOUNT */
-
-        if (mode === "signup") {
-
-          const result =
-            await supabaseClient.auth.signUp({
-
-              email: email,
-
-              password: password
-
-            });
-
-
-          if (result.error) {
-
-            throw result.error;
-
-          }
-
-
-          if (!result.data.session) {
-
-            status.textContent =
-              "Account created. Check your email to confirm your account.";
-
-            return;
-
-          }
-
-
-          await saveProfile(result.data.user);
-
-          showDashboard(result.data.user);
-
+    (() => {
+      'use strict';
+
+      const SUPABASE_URL = 'https://hfczfnaaqwsmvgahiygc.supabase.co';
+      const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_AfyF3k8-uEzorkoYC98D-Q_QRlgkuvS';
+
+      const authScreen = document.getElementById('authScreen');
+      const dashboard = document.getElementById('dashboard');
+      const authForm = document.getElementById('authForm');
+      const loginTab = document.getElementById('loginTab');
+      const signupTab = document.getElementById('signupTab');
+      const submitButton = document.getElementById('submitButton');
+      const status = document.getElementById('status');
+      const userEmail = document.getElementById('userEmail');
+      const logoutButton = document.getElementById('logoutButton');
+
+      let mode = 'login';
+      let supabaseClient = null;
+
+      function setStatus(message) {
+        status.textContent = message || '';
+      }
+
+      function setMode(nextMode) {
+        mode = nextMode;
+        const signup = mode === 'signup';
+        loginTab.classList.toggle('active', !signup);
+        signupTab.classList.toggle('active', signup);
+        submitButton.textContent = signup ? 'Create account' : 'Sign in';
+        setStatus('');
+      }
+
+      function showDashboard(user) {
+        authScreen.style.display = 'none';
+        dashboard.style.display = 'block';
+        userEmail.textContent = user?.email || '';
+      }
+
+      function showLogin() {
+        dashboard.style.display = 'none';
+        authScreen.style.display = 'flex';
+      }
+
+      async function saveProfile(user) {
+        if (!user || !supabaseClient) return;
+        const { error } = await supabaseClient.from('profiles').upsert({
+          id: user.id,
+          email: user.email,
+          display_name: user.email ? user.email.split('@')[0] : 'Virani User'
+        });
+        if (error) console.warn('Profile save skipped:', error.message);
+      }
+
+      async function handleAuth(event) {
+        event.preventDefault();
+
+        if (!supabaseClient) {
+          setStatus('Virani could not connect to Supabase. Please refresh the page.');
           return;
         }
 
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
 
-        /* LOGIN */
-
-        const result =
-          await supabaseClient.auth.signInWithPassword({
-
-            email: email,
-
-            password: password
-
-          });
-
-
-        if (result.error) {
-
-          throw result.error;
-
+        if (!email || !password) {
+          setStatus('Please enter your email and password.');
+          return;
         }
 
+        if (password.length < 6) {
+          setStatus('Password must be at least 6 characters.');
+          return;
+        }
 
-        await saveProfile(result.data.user);
+        submitButton.disabled = true;
+        setStatus(mode === 'signup' ? 'Creating your account...' : 'Signing you in...');
 
-        showDashboard(result.data.user);
+        try {
+          let result;
 
+          if (mode === 'signup') {
+            result = await supabaseClient.auth.signUp({ email, password });
+
+            if (result.error) throw result.error;
+
+            if (result.data.session && result.data.user) {
+              await saveProfile(result.data.user);
+              showDashboard(result.data.user);
+              return;
+            }
+
+            setStatus('Account created. Check your email to confirm your account, then log in.');
+            setMode('login');
+            return;
+          }
+
+          result = await supabaseClient.auth.signInWithPassword({ email, password });
+
+          if (result.error) throw result.error;
+
+          await saveProfile(result.data.user);
+          showDashboard(result.data.user);
+        } catch (error) {
+          console.error('Virani authentication error:', error);
+          setStatus(error?.message || 'Authentication failed. Please try again.');
+        } finally {
+          submitButton.disabled = false;
+        }
       }
 
-      catch (error) {
+      async function init() {
+        if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+          setStatus('Virani could not load the Supabase library. Refresh the page and try again.');
+          return;
+        }
 
-        console.error(error);
+        try {
+          supabaseClient = window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_PUBLISHABLE_KEY
+          );
 
-        status.textContent =
-          error.message ||
-          "Something went wrong.";
+          const { data, error } = await supabaseClient.auth.getSession();
+          if (error) throw error;
 
+          if (data?.session?.user) {
+            showDashboard(data.session.user);
+          } else {
+            showLogin();
+          }
+        } catch (error) {
+          console.error('Virani startup error:', error);
+          setStatus(error?.message || 'Virani could not start. Please refresh the page.');
+        }
       }
 
-    });
+      loginTab.addEventListener('click', () => setMode('login'));
+      signupTab.addEventListener('click', () => setMode('signup'));
+      authForm.addEventListener('submit', handleAuth);
 
-
-    /* ==================================================
-       SAVE PROFILE
-       ================================================== */
-
-    async function saveProfile(user) {
-
-      if (!user) {
-        return;
-      }
-
-      const result =
-        await supabaseClient
-          .from("profiles")
-          .upsert({
-
-            id: user.id,
-
-            email: user.email,
-
-            display_name:
-              user.email
-                ? user.email.split("@")[0]
-                : "Virani User"
-
-          });
-
-
-      if (result.error) {
-
-        console.error(
-          "Profile error:",
-          result.error
-        );
-
-      }
-
-    }
-
-
-    /* ==================================================
-       SHOW DASHBOARD
-       ================================================== */
-
-    function showDashboard(user) {
-
-      authScreen.style.display = "none";
-
-      dashboard.style.display = "block";
-
-      userEmail.textContent =
-        user?.email || "Virani User";
-
-    }
-
-
-    /* ==================================================
-       SHOW LOGIN
-       ================================================== */
-
-    function showLogin() {
-
-      dashboard.style.display = "none";
-
-      authScreen.style.display = "flex";
-
-    }
-
-
-    /* ==================================================
-       LOGOUT
-       ================================================== */
-
-    logoutButton.addEventListener("click", async function () {
-
-      await supabaseClient.auth.signOut();
-
-      showLogin();
-
-    });
-
-
-    /* ==================================================
-       CHECK EXISTING SESSION
-       ================================================== */
-
-    async function checkSession() {
-
-      const result =
-        await supabaseClient.auth.getSession();
-
-      const session =
-        result.data.session;
-
-      if (session && session.user) {
-
-        showDashboard(session.user);
-
-      } else {
-
+      logoutButton.addEventListener('click', async () => {
+        if (supabaseClient) await supabaseClient.auth.signOut();
         showLogin();
+        setMode('login');
+      });
 
-      }
-
-    }
-
-
-    /* ==================================================
-       START VIRANI
-       ================================================== */
-
-    checkSession();
-
+      init();
+    })();
   </script>
-
 </body>
 </html>
