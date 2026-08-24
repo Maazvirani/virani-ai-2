@@ -1,0 +1,68 @@
+name: Virani UI enhancement
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  enhance:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply UI and voice enhancements
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text()
+          marker='<!-- VIRANI_ENHANCEMENTS_V1 -->'
+          if marker in s:
+              raise SystemExit(0)
+          css=r'''<style id="virani-enhancement-css">
+          .ve-context{position:fixed;right:18px;top:82px;bottom:96px;width:min(440px,42vw);min-width:300px;background:rgba(7,8,9,.96);border:1px solid #3a2b20;border-radius:16px;box-shadow:0 20px 80px #000;z-index:100;display:flex;flex-direction:column;transform:translateX(calc(100% + 30px));transition:transform .35s ease;backdrop-filter:blur(16px)}
+          .ve-context.open{transform:translateX(0)}.ve-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #29211b}.ve-head b{font-size:11px;letter-spacing:1.6px}.ve-head button{border:1px solid #332820;background:#111;color:#aaa;border-radius:7px;padding:5px 8px}.ve-body{padding:16px;overflow:auto;white-space:pre-wrap;line-height:1.55;font-size:13px;color:#ddd}.ve-hint{color:#716a62;text-align:center;margin:auto;padding:20px}.ve-file{position:fixed;left:50%;bottom:78px;transform:translateX(-50%);z-index:101;width:min(760px,90%);padding:8px 12px;border:1px solid #30271f;border-radius:10px;background:#0b0b0c;color:#aaa;font-size:11px;display:none}.ve-file.show{display:block}@media(max-width:760px){.ve-context{left:10px;right:10px;top:66px;bottom:84px;width:auto;min-width:0}.ve-file{bottom:70px}}
+          </style>'''
+          html=r'''<aside id="veContext" class="ve-context"><div class="ve-head"><b>TEXT CONTEXT</b><button id="veClose">×</button></div><div id="veBody" class="ve-body"><div class="ve-hint">Say “Jarvis, open the text context frame” to open this panel.</div></div></aside><div id="veFile" class="ve-file"></div><input id="veFiles" type="file" multiple hidden>'''
+          js=r'''<script id="virani-enhancement-js">
+          (()=>{
+            const $=id=>document.getElementById(id), panel=$('veContext'),body=$('veBody'),fileBox=$('veFile');
+            const open=t=>{body.innerHTML='';const d=document.createElement('div');d.textContent=t||'No output yet.';body.appendChild(d);panel.classList.add('open')};
+            const close=()=>panel.classList.remove('open');
+            $('veClose').onclick=close;
+            window.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+            const concise='Answer directly and concisely. Remove filler, repeated conclusions, unnecessary introductions, excessive explanation, and long step-by-step material unless the user explicitly asks for detail. Prefer a short answer or brief bullets.';
+            const oldFetch=window.fetch;
+            window.fetch=async function(input,init){
+              try{const url=typeof input==='string'?input:(input&&input.url)||'';if(url.includes('/functions/v1/virani-gemini')&&init&&init.body){const b=JSON.parse(init.body);if(typeof b.message==='string'&&!b.message.includes(concise))b.message=concise+'\n\nUser request:\n'+b.message;init.body=JSON.stringify(b)}}catch(e){}
+              return oldFetch.apply(this,arguments)
+            };
+            const observer=new MutationObserver(()=>{
+              const rows=document.querySelectorAll('.message-row'); if(!rows.length)return;
+              const last=rows[rows.length-1],b=last.querySelector('.bubble'); if(!b)return;
+              if(last.classList.contains('assistant'))open(b.textContent);
+              const users=document.querySelectorAll('.message-row.user .bubble');const u=users[users.length-1]?.textContent||'';
+              if(/jarvis.*open.*(text|context)|open.*(text|context).*frame/i.test(u))open(b.textContent);
+              if(/jarvis.*(close|hide).*(text|context)|(close|hide).*(text|context).*frame/i.test(u))close();
+            });
+            observer.observe(document.body,{childList:true,subtree:true});
+            const attach=$('attachButton'),files=$('veFiles');
+            if(attach){attach.onclick=e=>{e.stopImmediatePropagation();files.click()}}
+            files.onchange=()=>{const fs=[...files.files];if(fs.length){fileBox.textContent='Attached: '+fs.map(f=>f.name).join(', ');fileBox.classList.add('show');const input=$('messageInput');if(input)input.value+=(input.value?' ':'')+'[Attached files: '+fs.map(f=>f.name).join(', ')+']';setTimeout(()=>fileBox.classList.remove('show'),5000)}};
+            let interruptRec=null;
+            function interruptStart(){const R=window.SpeechRecognition||window.webkitSpeechRecognition;if(!R)return;interruptRec=new R();interruptRec.lang='en-US';interruptRec.continuous=true;interruptRec.interimResults=true;interruptRec.onresult=e=>{for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0]?.transcript?.trim();if(t){if(window.speechSynthesis)window.speechSynthesis.cancel();const input=$('messageInput');if(input){input.value=(input.value+' '+t).trim();if(e.results[i].isFinal)setTimeout(()=>document.getElementById('sendButton')?.click(),250)}}}};interruptRec.onend=()=>{if(window.speechSynthesis?.speaking)try{interruptRec.start()}catch(e){}};try{interruptRec.start()}catch(e){}}
+            if(window.speechSynthesis){setInterval(()=>{if(window.speechSynthesis.speaking&&!interruptRec)interruptStart();if(!window.speechSynthesis.speaking&&interruptRec){try{interruptRec.stop()}catch(e){}interruptRec=null}},300)}
+          })();
+          </script>'''
+          s=s.replace('</body>',marker+css+html+js+'</body>')
+          p.write_text(s)
+          PY
+      - name: Commit enhancement
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git diff --cached --quiet || git commit -m 'Add Virani context panel, concise brain replies, and voice interruption'
+          git push
