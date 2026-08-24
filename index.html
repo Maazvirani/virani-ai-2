@@ -78,5 +78,62 @@
   document.getElementById('sendButton')?.addEventListener('click',watch);document.getElementById('messageInput')?.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey)watch()});
 })();
 </script><script src="./attachment-client.js"></script>
-</body>
+<!-- VIRANI_PRO_UI_V2 --><style id="virani-pro-css">
+/* Virani Pro / ChatGPT-Claude inspired control center */
+:root{--vp-bg:#090a0c;--vp-panel:#101216;--vp-panel2:#0c0e11;--vp-border:#242830;--vp-text:#f2f4f7;--vp-muted:#8d949f;--vp-accent:#2dd4bf;--vp-accent2:#22d3ee}
+#dashboard{background:var(--vp-bg)!important;color:var(--vp-text)!important}
+.shell{background:var(--vp-bg)!important}
+.sidebar{width:252px!important;padding:14px 12px!important;background:#0b0d10!important;border-right:1px solid var(--vp-border)!important}
+.sidebar-logo{font-size:17px!important;letter-spacing:4px!important;margin:4px 10px 18px!important;color:#e9edf2!important}
+.new-chat{background:#15181d!important;border:1px solid #2a2f38!important;border-radius:10px!important;color:#eef1f4!important;padding:10px 12px!important}
+.nav-item{padding:9px 11px!important;color:#9aa1ab!important;border-radius:8px!important;font-size:13px!important}
+.nav-item.active,.nav-item:hover{background:#181c22!important;color:#f5f7fa!important}
+.history-title{margin:18px 10px 7px!important;color:#626a75!important}
+.conversation{font-size:13px!important;padding:8px 10px!important}
+.sidebar-bottom{font-size:11px!important;color:#65707c!important}
+.main{background:var(--vp-bg)!important}
+.topbar{height:58px!important;padding:0 18px!important;border-bottom:1px solid var(--vp-border)!important;background:rgba(9,10,12,.9)!important;backdrop-filter:blur(16px)!important}
+.online{font-size:12px!important;color:#89919c!important}.online b{color:#e9edf2!important}
+.top-actions{gap:8px!important}.top-actions:before{content:'⌘  K';display:inline-flex;align-items:center;height:30px;padding:0 9px;border:1px solid #272c34;border-radius:7px;color:#737b86;font-size:11px}
+#logoutButton{height:30px!important;padding:0 10px!important;border:1px solid #292e36!important;background:#111419!important;color:#cbd1d8!important;border-radius:7px!important;font-size:12px!important}
+.chat{background:radial-gradient(circle at 50% 42%,rgba(45,212,191,.055),transparent 31%),var(--vp-bg)!important}
+.messages{padding:28px 24px 170px!important}
+.message-row{width:min(860px,94%)!important;margin-bottom:18px!important}
+.bubble{font-size:14px!important;line-height:1.62!important;box-shadow:none!important}
+.user .bubble{background:#1b1f25!important;border:1px solid #282e36!important;border-radius:16px!important}
+.assistant .bubble{background:transparent!important;border:0!important;padding-left:0!important;max-width:88%!important}
+.welcome{inset:58px 0 110px!important;background:transparent!important}
+.welcome h1{font-size:26px!important;letter-spacing:5px!important;margin:11px 0 5px!important;color:#eef2f5!important}
+.welcome p{font-size:12px!important;color:#727a84!important}
+.orb-wrap{width:310px!important;height:310px!important}
+.orb-glow{width:180px!important;height:180px!important;background:rgba(45,212,191,.18)!important;filter:blur(48px)!important}
+.orb{width:138px!important;height:138px!important;background:radial-gradient(circle,#ecfeff 0 2%,#67e8f9 5%,#22d3ee 13%,#0e7490 30%,#10222a 48%,#080b0d 72%)!important;box-shadow:0 0 18px #22d3ee,0 0 50px rgba(34,211,238,.35),0 0 110px rgba(45,212,191,.12)!important}
+.orb:before,.orb:after{border-color:rgba(34,211,238,.55)!important;box-shadow:0 0 15px rgba(34,211,238,.22)!important}
+.orb-core{width:12px!important;height:12px!important;background:#eaffff!important;box-shadow:0 0 15px #fff,0 0 45px #22d3ee!important}
+.ray{width:260px!important;background:linear-gradient(90deg,transparent,rgba(34,211,238,.35),transparent)!important}
+.status-line{bottom:86px!important;background:rgba(14,16,19,.9)!important;border:1px solid #252b33!important;color:#8e97a2!important;font-size:11px!important;box-shadow:0 8px 30px rgba(0,0,0,.35)!important}
+.status-dot.on{background:#2dd4bf!important;box-shadow:0 0 10px rgba(45,212,191,.8)!important}
+.ultron-label{color:#4e5863!important;letter-spacing:1.5px!important}
+.composer{bottom:18px!important;width:min(860px,94%)!important;padding:7px!important;background:#111419!important;border:1px solid #2a3038!important;border-radius:14px!important;box-shadow:0 18px 50px rgba(0,0,0,.4)!important}
+.composer input{font-size:14px!important;padding:11px 4px!important}.composer input::placeholder{color:#69717c!important}
+.icon,.send{width:40px!important;height:40px!important;border-radius:9px!important}.icon{background:#171b20!important;border:1px solid #292f37!important;color:#cdd3da!important}.icon.listening{background:#102b29!important;border-color:#2dd4bf!important;color:#5eead4!important;box-shadow:0 0 16px rgba(45,212,191,.12)!important}.send{background:#eef2f5!important;color:#0b0d0f!important}
+#vpClock{position:absolute;right:20px;top:76px;z-index:6;display:flex;gap:16px;align-items:center;color:#707984;font-size:11px;pointer-events:none}.vp-stat{display:flex;flex-direction:column;gap:3px;min-width:70px}.vp-stat b{font-size:12px;color:#cbd2d9;font-weight:600}.vp-stat span{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:#5f6873}
+#vpMode{position:absolute;left:20px;top:76px;z-index:6;font-size:10px;letter-spacing:1.2px;color:#58616c;pointer-events:none}.vp-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#2dd4bf;box-shadow:0 0 8px rgba(45,212,191,.7);margin-right:6px}
+#vpContext{position:fixed;top:72px;right:14px;bottom:82px;width:min(430px,38vw);z-index:30;background:rgba(14,16,20,.97);border:1px solid #2a3038;border-radius:14px;box-shadow:0 24px 80px rgba(0,0,0,.6);transform:translateX(calc(100% + 30px));transition:transform .25s ease;display:flex;flex-direction:column;backdrop-filter:blur(18px)}#vpContext.open{transform:translateX(0)}#vpContextHead{height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid #252b33;font-size:11px;letter-spacing:1px;color:#aeb6c0}#vpContextClose{border:0;background:transparent;color:#7d8691;font-size:20px}#vpContextBody{padding:16px;overflow:auto;color:#d2d7dd;font-size:13px;line-height:1.6;white-space:pre-wrap}
+#vpFileDock{position:fixed;right:20px;bottom:18px;z-index:31;color:#6e7782;font-size:10px;max-width:320px;display:none}.vp-file-chip{display:inline-block;margin:3px;padding:5px 8px;background:#15191e;border:1px solid #292f37;border-radius:7px}
+@media(max-width:900px){#vpClock{display:none}#vpContext{width:min(430px,calc(100vw - 20px));right:10px;top:62px;bottom:76px}.sidebar{width:225px!important}}
+@media(max-width:760px){#vpMode{display:none}.sidebar{display:none!important}.messages{padding:20px 10px 150px!important}.composer{width:calc(100% - 20px)!important;bottom:10px!important}.status-line{bottom:70px!important}.orb-wrap{width:260px!important;height:260px!important}.orb{width:120px!important;height:120px!important}}
+</style><div id="vpMode"><span class="vp-dot"></span>CONTROL CENTER · ULTRON VOICE</div><div id="vpClock"><div class="vp-stat"><b id="vpTime">--:--</b><span>Local time</span></div><div class="vp-stat"><b id="vpDate">---</b><span>Date</span></div></div><aside id="vpContext"><div id="vpContextHead"><span>TEXT CONTEXT</span><button id="vpContextClose">×</button></div><div id="vpContextBody">Context output will appear here.</div></aside><div id="vpFileDock"></div><script id="virani-pro-js">
+(()=>{
+  const q=id=>document.getElementById(id),ctx=q('vpContext'),ctxBody=q('vpContextBody'),dock=q('vpFileDock');
+  function clock(){const d=new Date();q('vpTime').textContent=d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});q('vpDate').textContent=d.toLocaleDateString([], {month:'short',day:'numeric'});}
+  clock();setInterval(clock,1000);
+  q('vpContextClose').onclick=()=>ctx.classList.remove('open');
+  function openContext(t){ctxBody.textContent=t||'No context available yet.';ctx.classList.add('open')}
+  const obs=new MutationObserver(()=>{const rows=document.querySelectorAll('.message-row');if(!rows.length)return;const last=rows[rows.length-1],b=last.querySelector('.bubble');if(b&&last.classList.contains('assistant'))ctxBody.textContent=b.textContent;const us=document.querySelectorAll('.message-row.user .bubble');const u=(us[us.length-1]?.textContent||'').toLowerCase();if(/jarvis.*open.*(text|context)|open.*(text|context).*frame/.test(u))openContext(b?.textContent);if(/jarvis.*(close|hide).*(text|context)|(close|hide).*(text|context).*frame/.test(u))ctx.classList.remove('open')});
+  obs.observe(document.body,{childList:true,subtree:true});
+  const input=q('messageInput'),attach=q('attachButton');if(attach){attach.addEventListener('click',()=>{const f=document.createElement('input');f.type='file';f.multiple=true;f.accept='*/*';f.onchange=()=>{dock.innerHTML=[...f.files].map(x=>'<span class="vp-file-chip">'+x.name.replace(/[<>]/g,'')+'</span>').join('');dock.style.display='block';setTimeout(()=>dock.style.display='none',6000);if(input)input.focus()};f.click()},{capture:true})}
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')ctx.classList.remove('open');if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();input?.focus()}});
+})();
+</script></body>
 </html>
