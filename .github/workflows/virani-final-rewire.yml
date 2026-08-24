@@ -1,0 +1,31 @@
+name: Deploy clean Virani frontend
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  deploy:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Replace legacy frontend with clean baseline
+        shell: bash
+        run: |
+          set -e
+          cp virani-clean.html index.html
+          rm -f workspace-ui.js live-preview.js attachment-client.js
+          rm -f .github/workflows/virani-workspace-wire.yml
+          rm -f .github/workflows/virani-attach-wire.yml
+          rm -f .github/workflows/virani-cleanup.yml
+          rm -f .github/workflows/virani-performance.yml
+          rm -f .github/workflows/virani-enhance.yml
+          rm -f .github/workflows/virani-files-ui.yml
+          rm -f .github/workflows/virani-attachment-fix.yml
+          git add -A
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git diff --cached --quiet || git commit -m 'Rewire Virani as a single lightweight stable frontend'
+          git push
